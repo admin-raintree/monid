@@ -1,6 +1,5 @@
 import { defineProvider, UsageModelKind } from "@shared/core";
 import { z } from "zod";
-import { zReadResult } from "./schema/output.ts";
 
 export default defineProvider({
     name: "betteroff",
@@ -13,10 +12,9 @@ export default defineProvider({
         docsUrl: "https://github.com/raintree-technology/betteroff.connectors",
         categories: ["household-finance"],
         notes: [
-            "Local candidate: hosted per-user credential resolution and OAuth refresh have not been verified.",
-            "Supply a valid access token obtained through BetterOff OAuth. Access tokens expire after 600 seconds; this connector does not acquire or refresh them.",
-            "Never supply tokens or household identifiers as tool input. Never use one household credential for other users.",
-            "The FREE usage model describes BetterOff read calls; hosted Monid offer pricing is not verified.",
+            "Supply a valid access token obtained through BetterOff OAuth. Access tokens expire after 600 seconds; the host must acquire and refresh them for the authenticated caller. This connector never receives refresh tokens.",
+            "Never supply tokens or household identifiers as tool input. Never share a household credential between callers, including members of the same Monid workspace.",
+            "Recurring streams require BetterOff Core and cashflow:read. FREE describes zero per-call provider usage, not BetterOff plan eligibility or Monid pricing.",
         ],
     },
     auth: {
@@ -86,7 +84,6 @@ export default defineProvider({
         },
     },
     output: {
-        schema: zReadResult,
         fromResponse: ({ data, utils }) =>
             utils.json.get(data.output, "$.result.structuredContent"),
     },

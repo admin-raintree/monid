@@ -1,6 +1,6 @@
 {
     "name": "synthetic-forbidden",
-    "description": "Synthetic shared MCP transport case; contains no household records or credentials.",
+    "description": "Synthetic revoked-grant problem response matching BetterOff MCP authorization; no household records or credentials.",
     "calls": [
         {
             "req": {
@@ -10,8 +10,13 @@
             "res": {
                 "status": 403,
                 "body": {
+                    "type": "about:blank",
+                    "title": "Forbidden",
+                    "status": 403,
+                    "detail": "This agent connection was disconnected or has expired. Reconnect it from BetterOff settings.",
                     "code": "AGENT_GRANT_REVOKED",
-                    "error": "Grant expired or revoked."
+                    "error": "This agent connection was disconnected or has expired. Reconnect it from BetterOff settings.",
+                    "message": "This agent connection was disconnected or has expired. Reconnect it from BetterOff settings."
                 }
             }
         }

@@ -16,8 +16,10 @@
                         "isError": true,
                         "structuredContent": {
                             "ok": false,
-                            "code": "AGENT_ACCESS_DENIED",
-                            "error": "Synthetic denial."
+                            "code": "FORBIDDEN",
+                            "error": "Synthetic denial.",
+                            "retryable": false,
+                            "nextStep": "Review the connection permissions in BetterOff."
                         },
                         "content": []
                     }

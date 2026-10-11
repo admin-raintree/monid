@@ -1,5 +1,6 @@
 import { defineEndpoint } from "@shared/core";
 import { zBody } from "./schema/inputs.ts";
+import { zOutput } from "./schema/output.ts";
 
 export default defineEndpoint({
     meta: {
@@ -11,6 +12,7 @@ export default defineEndpoint({
     },
     endpoint: "/get_setup_status",
     request: { method: "POST", path: "/mcp" },
+    output: { schema: zOutput },
     input: {
         schema: { body: zBody },
         toRequest: ({ data }) => ({

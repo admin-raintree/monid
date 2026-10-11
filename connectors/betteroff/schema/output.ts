@@ -1,11 +1,15 @@
 import { z } from "zod";
 
-// Validate the shared v4 result envelope; endpoint data is preserved verbatim.
+// Match BetterOff's v4 contract without stripping fields added by the provider.
+export const zMoney = z.union([
+    z.number(),
+    z.string().regex(/^-?\d+(\.\d+)?$/),
+]);
+
 export const zReadResult = z.looseObject({
     ok: z.literal(true),
     schemaVersion: z.literal("4"),
     requestId: z.string().optional(),
-    data: z.json(),
     currency: z.string().nullable(),
     timezone: z.string(),
     asOf: z.string().nullable(),
