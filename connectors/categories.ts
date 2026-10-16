@@ -370,4 +370,25 @@ export const LEAF_CATEGORIES = defineLeafCategories([
         description:
             "Read an authorized household's financial records and account connection status.",
     },
+    {
+        id: "academic-search",
+        displayName: "Academic Search",
+        description:
+            "Tools to search scholarly sources, including papers, authors, " +
+            "citations, and more.",
+    },
+    {
+        id: "events",
+        displayName: "Events",
+        description:
+            "Tools to pull event listings, including concerts, conferences, " +
+            "dates, venues, and more.",
+    },
+    {
+        id: "government-data",
+        displayName: "Government Data",
+        description:
+            "Tools to pull public government records, including financial " +
+            "disclosures, filings, registries, and more.",
+    },
 ]);
