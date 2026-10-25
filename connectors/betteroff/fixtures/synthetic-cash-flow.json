@@ -72,7 +72,8 @@
                                     "netCashFlow": "1500.00",
                                     "savingsRatePercent": 31
                                 }
-                            }
+                            },
+                            "revision": 1
                         },
                         "content": []
                     }

@@ -8,7 +8,7 @@ export default defineEndpoint({
         summary:
             "Read connected-account coverage and connections that need repair. Cannot complete setup or change billing.",
         description:
-            "Read connected-account coverage and connections that need repair. Cannot complete setup or change billing. Requires accounts:read in the household OAuth grant. Preserve dates, warnings, quality, evidence, and pagination in the result.",
+            "Read connected-account coverage and connections that need repair. Cannot complete setup or change billing. Requires BetterOff Core and accounts:read in the household OAuth grant. Preserve dates, warnings, quality, evidence, and pagination in the result.",
     },
     endpoint: "/get_setup_status",
     request: { method: "POST", path: "/mcp" },

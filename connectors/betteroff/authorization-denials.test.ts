@@ -1,3 +1,4 @@
+import { cases } from "./test-cases.ts";
 import type { Json, RunInput } from "@shared/core";
 import { directTransport, Engine } from "@monid/connector-engine";
 import { assertEquals } from "@std/assert";
@@ -5,14 +6,7 @@ import { fromFileUrl } from "@std/path";
 import { loadFixture, testSealedUnit } from "@shared/testing";
 
 const fixtureRoot = fromFileUrl(new URL("./fixtures/", import.meta.url));
-const endpoints: { name: string; input: RunInput }[] = [
-    { name: "get_setup_status", input: { body: {} } },
-    {
-        name: "get_cash_flow",
-        input: { body: { startDate: null, endDate: null } },
-    },
-    { name: "list_recurring", input: { body: {} } },
-];
+const endpoints = cases;
 
 // Stable denial codes from BetterOff MCP authorization. Fixtures are synthetic;
 // these tests verify propagation, not provider-side authorization decisions.
@@ -23,6 +17,7 @@ for (const { name, input } of endpoints) {
             const [fixtureName, code] of [
                 ["invalid-token", "AGENT_TOKEN_INVALID"],
                 ["forbidden", "AGENT_GRANT_REVOKED"],
+                ["forbidden", "AGENT_SUBSCRIPTION_INACTIVE"],
                 ["forbidden", "AGENT_NOT_OWNER"],
                 ["forbidden", "AGENT_AI_CONSENT_REQUIRED"],
                 ["forbidden", "AGENT_ACCOUNT_DELETION_PENDING"],

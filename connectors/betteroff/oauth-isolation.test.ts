@@ -1,3 +1,4 @@
+import { cases } from "./test-cases.ts";
 import type { Json, RunInput } from "@shared/core";
 import { directTransport, Engine } from "@monid/connector-engine";
 import { assert, assertEquals, assertRejects } from "@std/assert";
@@ -8,21 +9,8 @@ import { loadFixture, testSealedUnit } from "@shared/testing";
 // Caller identity, connections, and tokens are synthetic host stand-ins. They
 // do not implement or verify Monid's hosted OAuth storage or refresh protocol.
 const fixtureRoot = fromFileUrl(new URL("./fixtures/", import.meta.url));
-const cases: { endpoint: string; fixture: string; input: RunInput }[] = [
-    {
-        endpoint: "get_setup_status",
-        fixture: "setup-status",
-        input: { body: {} },
-    },
-    {
-        endpoint: "get_cash_flow",
-        fixture: "cash-flow",
-        input: { body: { startDate: null, endDate: null } },
-    },
-    { endpoint: "list_recurring", fixture: "recurring", input: { body: {} } },
-];
 
-for (const { endpoint, fixture: fixtureName, input } of cases) {
+for (const { name: endpoint, fixture: fixtureName, input } of cases) {
     Deno.test(`betteroff#${endpoint}: caller-bound credentials isolate concurrent runs in one workspace`, async () => {
         const unit = await testSealedUnit(`betteroff#${endpoint}`);
         const fixture = await loadFixture(

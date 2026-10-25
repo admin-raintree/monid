@@ -5,16 +5,18 @@ export default defineProvider({
     name: "betteroff",
     meta: {
         displayName: "BetterOff",
-        summary: "Read an authorized household's financial context.",
+        summary: "Read household finances and prepare user-requested changes.",
         description:
-            "Read setup status, cash flow, and Plaid-reported recurring streams from an existing BetterOff household. Requires that household owner's OAuth authorization and household AI consent. Returns source dates and data-quality limits. Does not connect accounts, approve corrections, or execute payments or trades.",
+            "Expose 29 BetterOff tools: 21 reads and eight state-writing tools for proposals, action requests, cancellation, and opt-in feedback. Every call requires Core access, household-owner OAuth authorization, AI consent, and tool-specific scopes. Corrections and financial actions require approval in BetterOff; wallet actions also require signing. Cancellation and feedback take effect when called.",
         homepageUrl: "https://betteroff.finance",
         docsUrl: "https://github.com/raintree-technology/betteroff.connectors",
         categories: ["household-finance"],
         notes: [
             "Supply a valid access token obtained through BetterOff OAuth. Access tokens expire after 600 seconds; the host must acquire and refresh them for the authenticated caller. This connector never receives refresh tokens.",
+            "Use authorization-code OAuth with S256 PKCE and the generic resource https://api.betteroff.finance/mcp. Request only the scopes for the user-enabled tools. Transfer scopes are unavailable on the ChatGPT resource.",
+            "Monid hosted caller credential selection, refresh/disconnect coordination, and saved-result privacy remain unverified. Preparation tools require authenticated review links in BetterOff; this connector cannot attest to host confirmation UX.",
             "Never supply tokens or household identifiers as tool input. Never share a household credential between callers, including members of the same Monid workspace.",
-            "Recurring streams require BetterOff Core and cashflow:read. FREE describes zero per-call provider usage, not BetterOff plan eligibility or Monid pricing.",
+            "All tools require BetterOff Core, including reads and feedback. Paid, complimentary, and payment-grace Core access qualify; Free and trials do not. BetterOff enforces access on each call. FREE describes zero per-call provider usage, not plan eligibility or Monid pricing.",
         ],
     },
     auth: {

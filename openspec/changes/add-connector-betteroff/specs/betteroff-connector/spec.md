@@ -1,10 +1,10 @@
-# BetterOff read connector requirements
+# BetterOff connector requirements
 
 ## ADDED Requirements
 
-### Requirement: Three fixed read endpoints
+### Requirement: All 29 fixed endpoints
 
-The connector SHALL expose only `betteroff#get_setup_status`, `betteroff#get_cash_flow`, and `betteroff#list_recurring`. Each SHALL send a fixed `tools/call` request to BetterOff's existing `/mcp` endpoint with JSON-RPC version `2.0`, ID `1`, and protocol header `2025-03-26`.
+The connector SHALL expose the 29 current tools: 21 reads and eight writes, matching the BetterOff catalog retrieved October 25, 2026. It SHALL NOT expose apply, approve, sign, or execution routes. Each SHALL send a fixed `tools/call` request to BetterOff's existing `/mcp` endpoint with JSON-RPC version `2.0`, ID `1`, and protocol header `2025-03-26`.
 
 #### Scenario: A caller reads cash flow
 
@@ -45,7 +45,7 @@ Both date fields SHALL be required nullable ISO calendar dates. Null start SHALL
 
 ### Requirement: Successful results have endpoint-specific shapes
 
-The connector SHALL validate the version 4 envelope and each endpoint's required data fields. Success data SHALL be a non-null object. Additional fields SHALL remain intact. Decimal strings, numeric contract values, nulls, quality, dates, evidence, warnings, and pagination SHALL pass through without conversion.
+The connector SHALL validate the version 4 envelope and each endpoint's required data fields. Financial success data SHALL follow each endpoint's object or array schema. Feedback SHALL return a version 4 receipt. New financial tools SHALL require both revision fields; the original three MAY accept pre-revision v4 results. Additional fields SHALL remain intact. Decimal strings, numeric contract values, nulls, quality, dates, evidence, warnings, and pagination SHALL pass through without conversion.
 
 #### Scenario: A partial recurring result
 
@@ -100,16 +100,17 @@ Hosted publication SHALL require verified caller-to-household credential binding
 - **THEN** each caller reads only its own authorized household
 - **AND** a shared household token is not used for unrelated callers
 
-### Requirement: Recurring data requires Core entitlement
+### Requirement: Every tool requires Core entitlement
 
-`list_recurring` SHALL document BetterOff Core and `cashflow:read` as separate prerequisites. FREE SHALL describe zero per-call provider usage, not plan eligibility or hosted pricing. BetterOff SHALL remain responsible for checking current entitlement.
+All 29 tools SHALL document BetterOff Core and their tool-specific scopes as separate prerequisites. Paid, complimentary, and payment-grace Core access qualify; Free and trials do not. FREE SHALL describe zero per-call provider usage, not plan eligibility or hosted pricing. BetterOff SHALL remain responsible for checking current entitlement.
 
 #### Scenario: A household lacks Core
 
-- **WHEN** BetterOff returns HTTP 200 with a failed MCP result carrying `AGENT_SUBSCRIPTION_INACTIVE`
-- **THEN** the connector returns a provider error with HTTP 502 and `providerHttpStatus: 200`
+- **WHEN** BetterOff returns HTTP 403 carrying `AGENT_SUBSCRIPTION_INACTIVE` for any tool
+- **THEN** the connector preserves HTTP 403 and the original denial body
+- **AND** a legacy HTTP 200 failed MCP result still maps to 502 with `providerHttpStatus: 200`
 - **AND** it preserves the error code, retryability, and recovery instructions with zero usage
-- **AND** it does not turn the denial into an empty successful recurring result
+- **AND** it does not turn the denial into an empty successful result
 
 ### Requirement: The host selects private OAuth credentials
 
@@ -139,3 +140,35 @@ Hosted execution SHALL bind credential selection to an authenticated principal a
 - **WHEN** BetterOff refuses an invalid token, insufficient scope, revoked grant, lost ownership, missing consent, or pending account deletion
 - **THEN** the connector preserves the provider status and structured denial body with zero usage
 - **AND** refresh, reconnect, and scope escalation remain host decisions
+
+### Requirement: State-writing tools do not bypass BetterOff approval
+
+Proposals and financial requests SHALL preserve review links, pending status, terms, and source limitations. The connector SHALL make only the named MCP call and SHALL NOT follow the link or approve, apply, sign, or execute. Cancellation SHALL be described as an immediate state change, and provider refusal SHALL remain an error. Feedback SHALL require `userApproved: true`; the host SHALL obtain actual consent.
+
+#### Scenario: An outside agent prepares a transfer
+
+- **WHEN** a wallet or vault request omits its idempotency key
+- **THEN** input validation fails before credential lookup or network access
+- **WHEN** the user authorizes retrying the same request with its original key
+- **THEN** the connector forwards that key unchanged and makes one request per invocation
+- **AND** local forwarding tests do not establish provider deduplication
+
+#### Scenario: Bank discovery and preparation
+
+- **WHEN** bank-transfer input is empty
+- **THEN** the connector permits eligible-account discovery
+- **WHEN** input contains creation fields
+- **THEN** source, destination, amount, and idempotency key are all required
+- **AND** partial creation input fails before transport
+
+#### Scenario: Feedback consent is missing
+
+- **WHEN** approval is absent or false
+- **THEN** validation fails before credential lookup or egress
+- **AND** a true flag SHALL NOT be represented as proof that the host obtained human consent
+
+#### Scenario: Hosted mutation support is not established
+
+- **WHEN** local compiled tests pass for all 29 tools
+- **THEN** hosted caller credential selection, OAuth refresh/disconnect coordination, saved-result privacy, and write confirmation behavior remain unverified
+- **AND** financial approval and signing remain in BetterOff

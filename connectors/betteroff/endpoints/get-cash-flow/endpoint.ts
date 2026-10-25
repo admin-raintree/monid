@@ -8,7 +8,7 @@ export default defineEndpoint({
         summary:
             "Read income, expenses, prior-period comparison, and projections for a date range of at most 366 days.",
         description:
-            "Read income, expenses, prior-period comparison, and projections for a date range of at most 366 days. Requires cashflow:read in the household OAuth grant. Preserve dates, warnings, quality, evidence, and pagination in the result.",
+            "Read income, expenses, prior-period comparison, and projections for a date range of at most 366 days. Requires BetterOff Core and cashflow:read in the household OAuth grant. Preserve dates, warnings, quality, evidence, and pagination in the result.",
         notes: [
             "Supply both date fields. Null startDate means the start of the current month; null endDate means today, in the household's time zone.",
             "The date range must run forward and span at most 366 days. BetterOff returns a tool error for an invalid range.",

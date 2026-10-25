@@ -1,3 +1,4 @@
+import { cases } from "./test-cases.ts";
 import type { Json, RunInput } from "@shared/core";
 import { assert, assertEquals, assertRejects } from "@std/assert";
 import { fromFileUrl } from "@std/path";
@@ -10,17 +11,9 @@ import {
 import { directTransport, Engine } from "@monid/connector-engine";
 
 const fixtureRoot = fromFileUrl(new URL("./fixtures/", import.meta.url));
-const endpoints: { name: string; fixture: string; input: RunInput }[] = [
-    { name: "get_setup_status", fixture: "setup-status", input: { body: {} } },
-    {
-        name: "get_cash_flow",
-        fixture: "cash-flow",
-        input: { body: { startDate: "2026-10-01", endDate: "2026-10-10" } },
-    },
-    { name: "list_recurring", fixture: "recurring", input: { body: {} } },
-];
+const endpoints = cases;
 
-Deno.test("betteroff: three read endpoints share auth, lifecycle, and output mapping", async () => {
+Deno.test("betteroff: all 29 endpoints share auth, lifecycle, and output mapping", async () => {
     const bundle = await testBundle();
     const ids = Object.keys(bundle.endpoints).filter((id) =>
         id.startsWith("betteroff#")
@@ -134,45 +127,50 @@ for (const { name, fixture: fixtureName, input } of endpoints) {
         }
     });
 
-    Deno.test(`betteroff#${name}: preserves quality states, pagination, and added provider fields`, async () => {
-        const unit = await testSealedUnit(`betteroff#${name}`);
-        for (const state of ["complete", "partial", "unavailable"]) {
-            const fixture = await loadFixture(
-                `${fixtureRoot}synthetic-${fixtureName}.json`,
-            );
-            const structured = (fixture.calls[0].res.body as {
-                result: { structuredContent: Record<string, Json> };
-            }).result.structuredContent;
-            structured.quality = {
-                state,
-                reasons: state === "complete"
-                    ? []
-                    : ["Synthetic coverage limit."],
-                providerCoverage: null,
-            };
-            structured.page = {
-                returnedCount: 1,
-                totalCount: null,
-                truncated: true,
-                nextCursor: { id: "synthetic-cursor" },
-            };
-            structured.currency = null;
-            structured.asOf = null;
-            structured.providerExtension = { available: false };
-            (structured.data as Record<string, Json>).providerExtension = {
-                source: "synthetic",
-            };
-            const result = await runEndpoint({
-                unit,
-                input,
-                mode: "replay",
-                fixture,
-            });
-            assertEquals(result.isProviderError, false);
-            assertEquals(result.output, structured);
-            assertEquals(result.usage, { credits: {}, evidence: {} });
-        }
-    });
+    if (name !== "submit_feedback") {
+        Deno.test(`betteroff#${name}: preserves quality states, pagination, and added provider fields`, async () => {
+            const unit = await testSealedUnit(`betteroff#${name}`);
+            for (const state of ["complete", "partial", "unavailable"]) {
+                const fixture = await loadFixture(
+                    `${fixtureRoot}synthetic-${fixtureName}.json`,
+                );
+                const structured = (fixture.calls[0].res.body as {
+                    result: { structuredContent: Record<string, Json> };
+                }).result.structuredContent;
+                structured.quality = {
+                    state,
+                    reasons: state === "complete"
+                        ? []
+                        : ["Synthetic coverage limit."],
+                    providerCoverage: null,
+                };
+                structured.page = {
+                    returnedCount: 1,
+                    totalCount: null,
+                    truncated: true,
+                    nextCursor: { id: "synthetic-cursor" },
+                };
+                structured.currency = null;
+                structured.asOf = null;
+                structured.providerExtension = { available: false };
+                if (!Array.isArray(structured.data)) {
+                    (structured.data as Record<string, Json>)
+                        .providerExtension = {
+                            source: "synthetic",
+                        };
+                }
+                const result = await runEndpoint({
+                    unit,
+                    input,
+                    mode: "replay",
+                    fixture,
+                });
+                assertEquals(result.isProviderError, false);
+                assertEquals(result.output, structured);
+                assertEquals(result.usage, { credits: {}, evidence: {} });
+            }
+        });
+    }
 }
 
 for (

@@ -46,7 +46,7 @@
                             "notes": "Preserve source dates and data-quality limits.",
                             "data": {
                                 "access": {
-                                    "state": "free",
+                                    "state": "paid",
                                     "accessEndsAt": null
                                 },
                                 "accounts": {
@@ -71,7 +71,8 @@
                                     }
                                 ],
                                 "manageAgentAccessUrl": "https://app.betteroff.finance/settings/agents"
-                            }
+                            },
+                            "revision": 1
                         },
                         "content": []
                     }
