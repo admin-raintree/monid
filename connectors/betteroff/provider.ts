@@ -14,7 +14,6 @@ export default defineProvider({
         notes: [
             "Supply a valid access token obtained through BetterOff OAuth. Access tokens expire after 600 seconds; the host must acquire and refresh them for the authenticated caller. This connector never receives refresh tokens.",
             "Use authorization-code OAuth with S256 PKCE and the generic resource https://api.betteroff.finance/mcp. Request only the scopes for the user-enabled tools. Transfer scopes are unavailable on the ChatGPT resource.",
-            "Monid hosted caller credential selection, refresh/disconnect coordination, and saved-result privacy remain unverified. Preparation tools require authenticated review links in BetterOff; this connector cannot attest to host confirmation UX.",
             "Never supply tokens or household identifiers as tool input. Never share a household credential between callers, including members of the same Monid workspace.",
             "All tools require BetterOff Core, including reads and feedback. Paid, complimentary, and payment-grace Core access qualify; Free and trials do not. BetterOff enforces access on each call. FREE describes zero per-call provider usage, not plan eligibility or Monid pricing.",
         ],
